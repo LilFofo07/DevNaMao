@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -10,9 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { MenuItems, addMenuItem } from "@/lib/data"
-import { ArrowLeft, LogOut, Plus, Trash } from "lucide-react"
+import { addMenuItem, getMenuItems, removeMenuItem, type MenuItem } from "@/lib/supabase"
+import { ArrowLeft, LogOut, Plus, Trash, Upload } from "lucide-react"
 import Image from "next/image"
+import { uploadImage } from "@/lib/upload"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -20,45 +21,95 @@ export default function DashboardPage() {
   const [description, setDescription] = useState("")
   const [price, setPrice] = useState("")
   const [imageUrl, setImageUrl] = useState("")
-  const [items, setItems] = useState(MenuItems)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [items, setItems] = useState<MenuItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Carregar itens do menu ao montar o componente
+    loadMenuItems()
+  }, [])
+
+  const loadMenuItems = async () => {
+    const menuItems = await getMenuItems()
+    setItems(menuItems)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
 
-    if (!name || !description || !price || !imageUrl) {
-      alert("Por favor, preencha todos os campos")
-      return
+    try {
+      if (!name || !description || !price) {
+        alert("Por favor, preencha todos os campos obrigatórios")
+        return
+      }
+
+      let finalImageUrl = imageUrl
+
+      // Se houver um arquivo de imagem selecionado, faça o upload
+      if (imageFile) {
+        setUploading(true)
+        finalImageUrl = await uploadImage(imageFile)
+        setUploading(false)
+      }
+
+      if (!finalImageUrl) {
+        finalImageUrl = "/placeholder.svg"
+      }
+
+      const newItem = {
+        name,
+        description,
+        price: Number.parseFloat(price),
+        imageUrl: finalImageUrl,
+      }
+
+      // Adiciona o item ao banco de dados
+      const addedItem = await addMenuItem(newItem)
+
+      if (addedItem) {
+        // Atualiza a lista de itens
+        setItems([addedItem, ...items])
+
+        // Limpa o formulário
+        setName("")
+        setDescription("")
+        setPrice("")
+        setImageUrl("")
+        setImageFile(null)
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar item:", error)
+      alert("Ocorreu um erro ao adicionar o item. Tente novamente.")
+    } finally {
+      setLoading(false)
     }
-
-    const newItem = {
-      id: Date.now().toString(),
-      name,
-      description,
-      price: Number.parseFloat(price),
-      imageUrl,
-    }
-
-    // Adiciona o item ao estado local e ao "banco de dados" simulado
-    addMenuItem(newItem)
-    setItems([...items, newItem])
-
-    // Limpa o formulário
-    setName("")
-    setDescription("")
-    setPrice("")
-    setImageUrl("")
   }
 
   const handleLogout = () => {
     router.push("/")
   }
 
-  const handleDelete = (id: string) => {
-    // Remove o item do estado local
-    const updatedItems = items.filter((item) => item.id !== id)
-    setItems(updatedItems)
+  const handleDelete = async (id: string) => {
+    if (confirm("Tem certeza que deseja excluir este item?")) {
+      const success = await removeMenuItem(id)
+      if (success) {
+        // Remove o item do estado local
+        setItems(items.filter((item) => item.id !== id))
+      } else {
+        alert("Erro ao excluir o item. Tente novamente.")
+      }
+    }
+  }
 
-    // Em uma aplicação real, você também removeria do banco de dados
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0])
+      // Cria uma URL temporária para preview
+      setImageUrl(URL.createObjectURL(e.target.files[0]))
+    }
   }
 
   return (
@@ -94,7 +145,7 @@ export default function DashboardPage() {
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Nome do Lanche</Label>
+                    <Label htmlFor="name">Nome do Lanche*</Label>
                     <Input
                       id="name"
                       value={name}
@@ -104,7 +155,7 @@ export default function DashboardPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="description">Descrição</Label>
+                    <Label htmlFor="description">Descrição*</Label>
                     <Textarea
                       id="description"
                       value={description}
@@ -114,7 +165,7 @@ export default function DashboardPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="price">Preço (R$)</Label>
+                    <Label htmlFor="price">Preço (R$)*</Label>
                     <Input
                       id="price"
                       type="number"
@@ -127,18 +178,42 @@ export default function DashboardPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="imageUrl">URL da Imagem</Label>
-                    <Input
-                      id="imageUrl"
-                      value={imageUrl}
-                      onChange={(e) => setImageUrl(e.target.value)}
-                      placeholder="https://exemplo.com/imagem.jpg"
-                      required
-                    />
-                    <p className="text-xs text-gray-500">Dica: Use imagens do Unsplash ou similar para testes</p>
+                    <Label htmlFor="image">Imagem do Lanche</Label>
+                    <div className="flex flex-col gap-4">
+                      {imageUrl && (
+                        <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                          <Image src={imageUrl || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <label htmlFor="image-upload" className="cursor-pointer">
+                          <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90">
+                            <Upload className="h-4 w-4" />
+                            <span>Escolher arquivo</span>
+                          </div>
+                          <input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleFileChange}
+                          />
+                        </label>
+                        <Input
+                          id="imageUrl"
+                          value={imageFile ? "" : imageUrl}
+                          onChange={(e) => {
+                            setImageUrl(e.target.value)
+                            setImageFile(null)
+                          }}
+                          placeholder="Ou cole uma URL de imagem"
+                          disabled={!!imageFile}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <Button type="submit" className="w-full">
-                    Adicionar Item
+                  <Button type="submit" className="w-full" disabled={loading || uploading}>
+                    {loading || uploading ? "Processando..." : "Adicionar Item"}
                   </Button>
                 </form>
               </CardContent>
