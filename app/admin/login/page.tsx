@@ -81,7 +81,7 @@ export default function LoginPage() {
           <p className="text-xs text-gray-500 text-center">
             Para fins de demonstração, use:
             <br />
-            Usuário: <span className="font-mono">admin</span> | Senha: <span className="font-mono">admin123</span>
+            Usuário: <span className="font-mono">..</span> | Senha: <span className="font-mono">..</span>
           </p>
         </CardFooter>
       </Card>
