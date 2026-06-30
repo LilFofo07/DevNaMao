@@ -1,0 +1,70 @@
+<Window x:Class="PDVCentral.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Painel de Controle Central - PDV" 
+        Height="768" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgDark}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar Lateral (Menu) -->
+        <Border Grid.Column="0" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BgPanelLighter}" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="90" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Cabeçalho com Logo -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                    <Ellipse Width="35" Height="35" Fill="{StaticResource PrimaryColor}" Margin="0,0,10,0">
+                        <Ellipse.Effect>
+                            <DropShadowEffect Color="#7F56D9" BlurRadius="12" ShadowDepth="0" />
+                        </Ellipse.Effect>
+                    </Ellipse>
+                    <StackPanel>
+                        <TextBlock Text="PDV Central" Foreground="{StaticResource TextPrimary}" FontSize="18" FontWeight="Bold"/>
+                        <TextBlock Text="Painel do Provedor" Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Itens de Menu -->
+                <StackPanel Grid.Row="1" Margin="0,10">
+                    <RadioButton x:Name="BtnDashboard" Style="{StaticResource SidebarButtonStyle}" Content="Painel Geral" IsChecked="True" Checked="MenuButton_Checked"/>
+                    <RadioButton x:Name="BtnClientes" Style="{StaticResource SidebarButtonStyle}" Content="Configuração Clientes" Checked="MenuButton_Checked"/>
+                    <RadioButton x:Name="BtnChat" Style="{StaticResource SidebarButtonStyle}" Content="Chat Suporte" Checked="MenuButton_Checked"/>
+                    <RadioButton x:Name="BtnManutencao" Style="{StaticResource SidebarButtonStyle}" Content="Manutenção Geral" Checked="MenuButton_Checked"/>
+                </StackPanel>
+
+                <!-- Status do Servidor no Rodapé -->
+                <Border Grid.Row="2" Background="{StaticResource BgPanelLighter}" Margin="15" Padding="15" CornerRadius="10">
+                    <StackPanel>
+                        <TextBlock Text="Servidor API Local" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,0,0,5"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Ellipse x:Name="ServerStatusLed" Width="10" Height="10" Fill="{StaticResource SuccessColor}" VerticalAlignment="Center" Margin="0,0,8,0">
+                                <Ellipse.Effect>
+                                    <DropShadowEffect Color="#12B76A" BlurRadius="8" ShadowDepth="0" />
+                                </Ellipse.Effect>
+                            </Ellipse>
+                            <TextBlock x:Name="ServerStatusText" Grid.Column="1" Text="Ativo na Porta 5050" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="SemiBold"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Área de Conteúdo Principal -->
+        <Grid Grid.Column="1" Margin="30">
+            <ContentControl x:Name="MainContent" />
+        </Grid>
+    </Grid>
+</Window>

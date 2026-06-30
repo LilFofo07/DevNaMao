@@ -1,0 +1,24 @@
+<Window x:Class="PDVModerno.Views.InputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Remover Produto" Width="350" SizeToContent="Height" MinHeight="220"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="ToolWindow"
+        Background="{StaticResource BgDark}"
+        Foreground="White">
+    <StackPanel Margin="20">
+        <TextBlock x:Name="LblQuestion" Text="Quantidade para remover?" FontSize="16" Margin="0,0,0,15" TextWrapping="Wrap" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
+        
+        <TextBox x:Name="TxtAnswer" FontSize="18" Padding="8" Margin="0,0,0,20" Background="{StaticResource BgPanel}" Foreground="{StaticResource TextPrimary}" BorderBrush="{StaticResource BgPanelLighter}" BorderThickness="1" HorizontalContentAlignment="Center"/>
+        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Cancelar" Click="BtnCancelar_Click" Style="{StaticResource DangerButtonStyle}" Padding="10,8" />
+            <Button Grid.Column="2" Content="Confirmar" Click="BtnConfirmar_Click" Style="{StaticResource SuccessButtonStyle}" Padding="10,8" IsDefault="True" />
+        </Grid>
+    </StackPanel>
+</Window>

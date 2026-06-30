@@ -1,0 +1,126 @@
+<Application x:Class="PDVCentral.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Cores e Pincéis (Design System - Dark Mode Purple) -->
+        <SolidColorBrush x:Key="BgDark" Color="#0B0B0F" />
+        <SolidColorBrush x:Key="BgPanel" Color="#12121A" />
+        <SolidColorBrush x:Key="BgPanelLighter" Color="#1E1E2D" />
+        
+        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#9499B3" />
+        
+        <!-- Cores de Ação -->
+        <SolidColorBrush x:Key="PrimaryColor" Color="#7F56D9" />
+        <SolidColorBrush x:Key="PrimaryHover" Color="#6941C6" />
+        <SolidColorBrush x:Key="PrimaryGlow" Color="#307F56D9" />
+        
+        <SolidColorBrush x:Key="SuccessColor" Color="#12B76A" />
+        <SolidColorBrush x:Key="SuccessHover" Color="#027A48" />
+        
+        <SolidColorBrush x:Key="DangerColor" Color="#F04438" />
+        <SolidColorBrush x:Key="DangerHover" Color="#B42318" />
+
+        <!-- Estilos de Botão Base -->
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="15,10" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource PrimaryHover}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SidebarButtonStyle" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Padding" Value="20,12" />
+            <Setter Property="Margin" Value="0,5" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}" Margin="10,0">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource BgPanelLighter}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryColor}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+            <Setter Property="Background" Value="{StaticResource SuccessColor}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource SuccessHover}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+            <Setter Property="Background" Value="{StaticResource DangerColor}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource DangerHover}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Inputs e TextBoxes -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource BgDark}" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BgPanelLighter}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="CaretBrush" Value="White" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>
