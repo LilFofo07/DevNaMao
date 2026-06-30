@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,25 @@ app.UseCors();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
-    db.Database.EnsureCreated();
+    if (db.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+    {
+        try
+        {
+            // Tenta verificar se a tabela Clientes existe no banco do Supabase
+            _ = db.Clientes.Any();
+        }
+        catch
+        {
+            // Se falhar (tabela não existe no public schema), força a criação de todas as tabelas
+            var creator = (Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator)
+                db.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IDatabaseCreator>();
+            creator.CreateTables();
+        }
+    }
+    else
+    {
+        db.Database.EnsureCreated();
+    }
 }
 
 // ROTA: Obter token Mercado Pago do Cliente
