@@ -236,7 +236,8 @@ app.MapGet("/api/dashboard-stats", async (ApiDbContext db) =>
     });
 });
 
-app.Run("http://localhost:5080");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5080";
+app.Run($"http://0.0.0.0:{port}");
 
 // --- DEFINIÇÕES DE BANCO DE DADOS & ENTIDADES ---
 
